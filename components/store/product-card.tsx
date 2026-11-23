@@ -46,6 +46,7 @@ export function ProductCard({
             alt={product.title}
             className="object-contain p-5 transition duration-500 group-hover:scale-[1.015] sm:p-7"
             fill
+            loading={featured ? "eager" : "lazy"}
             sizes="(min-width: 1280px) 30vw, (min-width: 640px) 50vw, 100vw"
             src={imageUrl}
           />
