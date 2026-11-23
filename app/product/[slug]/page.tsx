@@ -1,7 +1,6 @@
 import {
   ArrowLeft,
   Check,
-  LockKeyhole,
   PackageCheck,
   ShieldCheck,
 } from "lucide-react";
@@ -10,8 +9,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getSellAppProducts } from "@/lib/sellapp";
+import { CheckoutForm } from "@/components/store/checkout-form";
+import {
+  getSellAppPaymentMethods,
+  getSellAppProducts,
+} from "@/lib/sellapp";
 import { getSellAppProductImage } from "@/lib/sellapp-image";
+import type { SellAppPaymentMethod } from "@/types/sellapp";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -51,7 +55,13 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = await findProduct(slug);
+  const [product, paymentMethods] = await Promise.all([
+    findProduct(slug),
+    getSellAppPaymentMethods().catch((error) => {
+      console.error("Unable to render Sell.app payment methods.", error);
+      return [] as SellAppPaymentMethod[];
+    }),
+  ]);
 
   if (!product) {
     notFound();
@@ -70,7 +80,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       : `${product.stock} in stock`;
 
   return (
-    <main className="relative isolate min-h-dvh overflow-hidden px-6 py-10 sm:px-10 lg:px-16">
+    <main className="relative isolate min-h-dvh overflow-hidden px-6 pb-28 pt-10 sm:px-10 lg:px-16 lg:pb-10">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_75%_24%,rgba(255,30,66,0.14),transparent_26%),radial-gradient(circle_at_15%_85%,rgba(255,255,255,0.05),transparent_28%)]"
@@ -93,7 +103,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </Link>
         </header>
 
-        <div className="grid gap-10 py-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(24rem,0.78fr)] lg:items-start lg:gap-16 lg:py-20">
+        <div className="grid gap-10 py-12 lg:grid-cols-[minmax(0,0.92fr)_minmax(24rem,0.78fr)] lg:items-start lg:gap-16">
           <section className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-liquid-chrome bg-[radial-gradient(circle_at_70%_24%,rgba(255,30,66,0.15),transparent_34%),linear-gradient(145deg,#101116,#050507)] lg:aspect-auto lg:h-[72vh] lg:min-h-[34rem] lg:max-h-[46rem]">
             <div
               aria-hidden="true"
@@ -126,7 +136,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {description}
             </p>
 
-            <div className="mt-9 rounded-[1.75rem] border border-liquid-chrome bg-carbon/90 p-6 shadow-2xl shadow-black/30 sm:p-7">
+            <div
+              className="mt-7 scroll-mt-6 rounded-[1.75rem] border border-liquid-chrome bg-carbon/90 p-6 shadow-2xl shadow-black/30 sm:p-7"
+              id="checkout"
+            >
               <div className="flex items-start justify-between gap-5 border-b border-liquid-chrome pb-6">
                 <div>
                   <p className="font-mono text-xs uppercase tracking-[0.16em] text-white/65">
@@ -147,38 +160,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </span>
               </div>
 
-              <div className="py-6">
-                <p className="font-mono text-xs uppercase tracking-[0.16em] text-white/65">
-                  Choose variant
-                </p>
-                <div className="mt-3 grid gap-2">
-                  {product.variants.map((variant) => (
-                    <div
-                      className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3.5"
-                      key={variant.id}
-                    >
-                      <span className="text-sm font-medium text-chrome">
-                        {variant.title}
-                      </span>
-                      <Check
-                        aria-hidden="true"
-                        className="size-4 text-crimson"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 rounded-2xl border border-liquid-chrome bg-white/[0.035] px-5 py-4 text-white">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-crimson/10 text-crimson">
-                  <LockKeyhole aria-hidden="true" className="size-4" />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold">Local secure checkout</p>
-                  <p className="mt-0.5 text-xs leading-5 text-white/60">
-                    This status panel will become active with checkout.
-                  </p>
-                </div>
+              <div className="pt-6">
+                <CheckoutForm
+                  paymentMethods={paymentMethods}
+                  productId={product.id}
+                  soldOut={product.sold_out}
+                  storeId={product.store_id}
+                  variants={product.variants}
+                />
               </div>
             </div>
 
@@ -202,6 +191,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </aside>
         </div>
+      </div>
+
+      <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
+        <Link
+          className="flex items-center justify-between rounded-2xl border border-white/10 bg-crimson px-5 py-4 text-white shadow-[0_18px_60px_rgba(0,0,0,0.5)]"
+          href="#checkout"
+        >
+          <span className="text-sm font-semibold">Continue to payment</span>
+          <span className="font-mono text-sm">{product.price_range}</span>
+        </Link>
       </div>
     </main>
   );

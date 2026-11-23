@@ -15,6 +15,7 @@ function mockProduct(
     slug,
     description: `${title} digital product with instant delivery.`,
     images: [],
+    store_id: 0,
     visibility: "PUBLIC",
     variants: [{ id: id * 10, title: "Default" }],
     url: "",

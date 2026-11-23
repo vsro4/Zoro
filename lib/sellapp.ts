@@ -2,6 +2,8 @@ import "server-only";
 
 import { mockSellAppProducts } from "@/lib/mock-sellapp";
 import type {
+  SellAppPaymentMethod,
+  SellAppPaymentMethodsResponse,
   SellAppProduct,
   SellAppProductsResponse,
 } from "@/types/sellapp";
@@ -11,6 +13,7 @@ const SELL_APP_API_BASE_URL =
 const MAX_PRODUCT_PAGES = 20;
 
 export const SELL_APP_PRODUCTS_TAG = "sellapp-products";
+export const SELL_APP_PAYMENT_METHODS_TAG = "sellapp-payment-methods";
 
 interface SellAppConfig {
   apiKey: string;
@@ -96,4 +99,45 @@ export async function getSellAppProducts(): Promise<SellAppProduct[]> {
   }
 
   return products.filter((product) => product.visibility === "PUBLIC");
+}
+
+export async function getSellAppPaymentMethods(): Promise<
+  SellAppPaymentMethod[]
+> {
+  const config = getSellAppConfig();
+
+  if (!config) {
+    return [];
+  }
+
+  const response = await fetch(`${SELL_APP_API_BASE_URL}/v2/payment-methods`, {
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${config.apiKey}`,
+      "X-STORE": config.store,
+    },
+    next: {
+      revalidate: 60,
+      tags: [SELL_APP_PAYMENT_METHODS_TAG],
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Sell.app payment methods request failed with ${response.status}.`,
+    );
+  }
+
+  const payload = (await response.json()) as SellAppPaymentMethodsResponse;
+
+  if (!Array.isArray(payload.data)) {
+    throw new Error("Sell.app returned an invalid payment methods response.");
+  }
+
+  return payload.data.filter(
+    (method) =>
+      method.enabled &&
+      method.status === "enabled" &&
+      method.health_status === "healthy",
+  );
 }

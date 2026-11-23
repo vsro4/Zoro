@@ -19,6 +19,7 @@ export interface SellAppProduct {
   slug: string;
   description: string;
   images: SellAppImage[];
+  store_id: number;
   visibility: "PUBLIC" | "HIDDEN" | string;
   variants: SellAppVariant[];
   url: string;
@@ -47,4 +48,19 @@ export interface SellAppProductsResponse {
   data: SellAppProduct[];
   links: SellAppPaginationLinks;
   meta: SellAppPaginationMeta;
+}
+
+export interface SellAppPaymentMethod {
+  id: string;
+  name: string;
+  description: string;
+  category: "processor" | "crypto";
+  connection_type: "oauth" | "api_keys" | "wallet" | "custom";
+  status: "disconnected" | "configured" | "enabled";
+  enabled: boolean;
+  health_status: "disconnected" | "healthy" | "attention_required";
+}
+
+export interface SellAppPaymentMethodsResponse {
+  data: SellAppPaymentMethod[];
 }
