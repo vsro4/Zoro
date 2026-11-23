@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 import { getSellAppProducts } from "@/lib/sellapp";
 import type { SellAppProduct } from "@/types/sellapp";
@@ -24,9 +25,7 @@ function ProductCard({ product }: { product: SellAppProduct }) {
             {product.title}
           </h3>
         </div>
-        {product.url ? (
-          <ArrowUpRight aria-hidden="true" className="size-5 text-mist" />
-        ) : null}
+        <ArrowUpRight aria-hidden="true" className="size-5 text-mist" />
       </div>
       <div className="mt-10 flex items-end justify-between gap-4">
         <span className="font-mono text-lg text-chrome">
@@ -43,19 +42,13 @@ function ProductCard({ product }: { product: SellAppProduct }) {
   const className =
     "group block rounded-2xl border border-liquid-chrome bg-carbon/80 p-5 transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.055]";
 
-  if (!product.url) {
-    return <article className={className}>{content}</article>;
-  }
-
   return (
-    <a
+    <Link
       className={className}
-      href={product.url}
-      rel="noreferrer"
-      target="_blank"
+      href={`/product/${encodeURIComponent(product.slug)}`}
     >
       {content}
-    </a>
+    </Link>
   );
 }
 
