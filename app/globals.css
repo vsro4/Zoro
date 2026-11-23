@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-abyss: var(--zoro-abyss);
+  --color-carbon: var(--zoro-carbon);
+  --color-chrome: var(--zoro-chrome);
+  --color-mist: var(--zoro-mist);
+  --color-crimson: var(--zoro-crimson);
+  --color-violet: var(--zoro-violet);
+  --color-cyan: var(--zoro-cyan);
+  --color-liquid-chrome: var(--zoro-liquid-chrome);
+
+  --font-display: var(--font-syne);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-arabic: var(--font-cairo);
+}
+
+:root {
+  --zoro-abyss: #040406;
+  --zoro-carbon: #0b0c10;
+  --zoro-chrome: #f8fafc;
+  --zoro-mist: #9ca3af;
+  --zoro-crimson: #ff1e42;
+  --zoro-violet: #8b5cf6;
+  --zoro-cyan: #22d3ee;
+  --zoro-liquid-chrome: rgb(255 255 255 / 0.08);
+  --zoro-surface-highlight: rgb(255 255 255 / 0.04);
+  --zoro-focus-ring: rgb(255 30 66 / 0.72);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--zoro-abyss);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    linear-gradient(180deg, var(--zoro-surface-highlight), transparent 22rem),
+    var(--zoro-abyss);
+  color: var(--zoro-chrome);
+  font-family: var(--font-inter), var(--font-cairo), sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+[dir="rtl"] body,
+[lang="ar"] body {
+  font-family: var(--font-cairo), var(--font-inter), sans-serif;
+}
+
+::selection {
+  background: var(--zoro-crimson);
+  color: var(--zoro-chrome);
+}
+
+:focus-visible {
+  outline: 2px solid var(--zoro-focus-ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
