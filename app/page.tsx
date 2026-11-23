@@ -1,13 +1,16 @@
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { getSellAppProducts } from "@/lib/sellapp";
+import { getSellAppProductImage } from "@/lib/sellapp-image";
 import type { SellAppProduct } from "@/types/sellapp";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
 
 function ProductCard({ product }: { product: SellAppProduct }) {
+  const imageUrl = getSellAppProductImage(product);
   const stockLabel = product.sold_out
     ? "Out of stock"
     : product.stock === null
@@ -16,6 +19,21 @@ function ProductCard({ product }: { product: SellAppProduct }) {
 
   const content = (
     <>
+      <div className="relative mb-5 aspect-[16/10] overflow-hidden rounded-xl border border-liquid-chrome bg-[radial-gradient(circle_at_70%_30%,rgba(255,30,66,0.18),transparent_38%),#07080b]">
+        {imageUrl ? (
+          <Image
+            alt={product.title}
+            className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            fill
+            sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+            src={imageUrl}
+          />
+        ) : (
+          <div className="absolute inset-0 grid place-items-center font-display text-4xl font-bold uppercase text-white/10">
+            Zoro
+          </div>
+        )}
+      </div>
       <div className="flex items-start justify-between gap-5">
         <div>
           <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-mist">

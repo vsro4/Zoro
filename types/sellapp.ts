@@ -3,12 +3,22 @@ export interface SellAppVariant {
   title: string;
 }
 
+export interface SellAppImage {
+  path: string;
+  metadata: {
+    size: number;
+    filename: string;
+    extension: string;
+    mime_type: string;
+  };
+}
+
 export interface SellAppProduct {
   id: number;
   title: string;
   slug: string;
   description: string;
-  images: string[];
+  images: SellAppImage[];
   visibility: "PUBLIC" | "HIDDEN" | string;
   variants: SellAppVariant[];
   url: string;

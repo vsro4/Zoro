@@ -1,9 +1,11 @@
 import { ArrowLeft, Check, PackageCheck, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getSellAppProducts } from "@/lib/sellapp";
+import { getSellAppProductImage } from "@/lib/sellapp-image";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -52,6 +54,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const description =
     plainText(product.description) ||
     "Instant digital delivery, securely fulfilled after checkout.";
+  const imageUrl = getSellAppProductImage(product);
   const stockLabel = product.sold_out
     ? "Out of stock"
     : product.stock === null
@@ -84,6 +87,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <div className="grid gap-12 py-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] lg:items-start lg:py-24">
           <section>
+            <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-3xl border border-liquid-chrome bg-[radial-gradient(circle_at_70%_30%,rgba(255,30,66,0.18),transparent_38%),#07080b]">
+              {imageUrl ? (
+                <Image
+                  alt={product.title}
+                  className="object-cover"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 58vw, 100vw"
+                  src={imageUrl}
+                />
+              ) : (
+                <div className="absolute inset-0 grid place-items-center font-display text-7xl font-bold uppercase text-white/10">
+                  Zoro
+                </div>
+              )}
+            </div>
             <p className="font-mono text-xs uppercase tracking-[0.26em] text-crimson">
               Live Sell.app product
             </p>
