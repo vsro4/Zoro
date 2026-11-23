@@ -64,5 +64,5 @@ them with its implementation.
 | Variable | Purpose |
 | --- | --- |
 | `SELL_APP_API_KEY` | Private Sell.app v2 API credential |
-| `SELL_APP_STORE_ID` | Sell.app store identifier |
+| `SELL_APP_STORE` | Storefront slug used by the Sell.app `X-STORE` header |
 | `SELL_APP_WEBHOOK_SECRET` | Signature secret for on-demand revalidation webhooks |

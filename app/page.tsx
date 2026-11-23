@@ -1,11 +1,80 @@
-export default function Home() {
+import { ArrowUpRight } from "lucide-react";
+
+import { getSellAppProducts } from "@/lib/sellapp";
+import type { SellAppProduct } from "@/types/sellapp";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+function ProductCard({ product }: { product: SellAppProduct }) {
+  const stockLabel = product.sold_out
+    ? "Out of stock"
+    : product.stock === null
+      ? "Instant delivery"
+      : `${product.stock} available`;
+
+  const content = (
+    <>
+      <div className="flex items-start justify-between gap-5">
+        <div>
+          <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-mist">
+            {stockLabel}
+          </p>
+          <h3 className="mt-3 font-display text-2xl font-semibold uppercase tracking-[-0.04em]">
+            {product.title}
+          </h3>
+        </div>
+        {product.url ? (
+          <ArrowUpRight aria-hidden="true" className="size-5 text-mist" />
+        ) : null}
+      </div>
+      <div className="mt-10 flex items-end justify-between gap-4">
+        <span className="font-mono text-lg text-chrome">
+          {product.price_range}
+        </span>
+        <span className="font-mono text-[0.65rem] uppercase tracking-[0.14em] text-mist">
+          {product.variants.length}{" "}
+          {product.variants.length === 1 ? "variant" : "variants"}
+        </span>
+      </div>
+    </>
+  );
+
+  const className =
+    "group block rounded-2xl border border-liquid-chrome bg-carbon/80 p-5 transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.055]";
+
+  if (!product.url) {
+    return <article className={className}>{content}</article>;
+  }
+
   return (
-    <main className="relative isolate flex min-h-dvh items-center overflow-hidden px-6 py-16 sm:px-10 lg:px-16">
+    <a
+      className={className}
+      href={product.url}
+      rel="noreferrer"
+      target="_blank"
+    >
+      {content}
+    </a>
+  );
+}
+
+export default async function Home() {
+  let products: SellAppProduct[] = [];
+
+  try {
+    products = await getSellAppProducts();
+  } catch (error) {
+    console.error("Unable to render Sell.app products.", error);
+  }
+
+  return (
+    <main className="relative isolate min-h-dvh overflow-hidden px-6 py-16 sm:px-10 lg:px-16">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_72%_32%,rgba(255,30,66,0.12),transparent_24%),radial-gradient(circle_at_18%_80%,rgba(255,255,255,0.06),transparent_30%)]"
       />
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-16">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-20">
         <header className="flex items-center justify-between border-b border-liquid-chrome pb-5">
           <span className="font-display text-xl font-bold uppercase tracking-[0.22em]">
             Zoro
@@ -26,6 +95,37 @@ export default function Home() {
             A precision-built storefront for instant digital banking, crypto,
             and telecom products.
           </p>
+        </section>
+
+        <section aria-labelledby="live-products">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-crimson">
+                Synced with Sell.app
+              </p>
+              <h2
+                className="mt-3 font-display text-3xl font-semibold uppercase tracking-[-0.045em] sm:text-5xl"
+                id="live-products"
+              >
+                Live products
+              </h2>
+            </div>
+            <span className="font-mono text-xs uppercase tracking-[0.16em] text-mist">
+              {products.length} {products.length === 1 ? "product" : "products"}
+            </span>
+          </div>
+
+          {products.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-liquid-chrome bg-carbon/70 p-8 text-sm text-mist">
+              Products are temporarily unavailable.
+            </div>
+          )}
         </section>
 
         <div className="grid gap-px overflow-hidden rounded-2xl border border-liquid-chrome bg-liquid-chrome sm:grid-cols-3">
